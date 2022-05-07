@@ -17,11 +17,11 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
-        const productsCollection = client.db("perfumes").collection("product");
+        const itemsCollection = client.db("perfumes").collection("product");
 
         app.get("/inventory", async (req, res) => {
             const query = {};
-            const cursor = productsCollection.find(query);
+            const cursor = itemsCollection.find(query);
             const product = await cursor.toArray();
             res.send(product);
         });
@@ -29,8 +29,13 @@ async function run() {
         app.get("/inventory/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const product = await productsCollection.findOne(query);
+            const product = await itemsCollection.findOne(query);
             res.send(product)
+        })
+        app.post("/inventory", async (req, res) => {
+            const newItem = req.body;
+            const result = await itemsCollection.insertOne(newItem);
+            res.send(result);
         })
     }
     finally {
