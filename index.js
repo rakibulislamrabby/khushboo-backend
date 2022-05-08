@@ -21,11 +21,14 @@ async function run() {
         const itemsCollection = client.db("perfumes").collection("product");
 
         app.get("/inventory", async (req, res) => {
-            const query = {};
+            const email = req.query.email;
+            console.log(email);
+            const query = { email: email };
             const cursor = itemsCollection.find(query);
             const product = await cursor.toArray();
             res.send(product);
         });
+
 
         app.get("/inventory/:id", async (req, res) => {
             const id = req.params.id;
