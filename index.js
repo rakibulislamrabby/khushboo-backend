@@ -37,18 +37,18 @@ async function run() {
         await client.connect();
         const itemsCollection = client.db("perfumes").collection("product");
 
-        app.get("/inventory", verifyjwt, async (req, res) => {
-            const decodedEmail = req.decoded.email;
+        app.get("/inventory", async (req, res) => {
+            // const decodedEmail = req.decoded.email;
             const email = req.query.email;
-            if (email == decodedEmail) {
-                const query = { email: email };
-                const cursor = itemsCollection.find(query);
-                const product = await cursor.toArray();
-                res.send(product);
-            }
-            else {
-                return res.status(403).send({ message: "Forbidden" });
-            }
+
+            const query = { email: email };
+            const cursor = itemsCollection.find(query);
+            const product = await cursor.toArray();
+            res.send(product);
+
+            // else {
+            //     return res.status(403).send({ message: "Forbidden" });
+            // }
 
         });
 
