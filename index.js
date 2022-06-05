@@ -10,23 +10,23 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// function verifyjwt(req, res, next) {
-//     const authHeader = req.headers.authorization;
-//     // console.log(authHeader);
+function verifyjwt(req, res, next) {
+    const authHeader = req.headers.authorization;
+    // console.log(authHeader);
 
-//     if (!authHeader) {
-//         return res.status(401).send({ massage: "unauthorized access" })
-//     }
-//     const token = authHeader.split(" ")[1];
-//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-//         if (err) {
-//             return res.status(403).send({ message: "forbidden" })
-//         }
-//         console.log('decoded', decoded);
-//         req.decoded = decoded;
-//         next();
-//     })
-// }
+    if (!authHeader) {
+        return res.status(401).send({ massage: "unauthorized access" })
+    }
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: "forbidden" })
+        }
+        console.log('decoded', decoded);
+        req.decoded = decoded;
+        next();
+    })
+}
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nu30w.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -36,18 +36,15 @@ async function run() {
     try {
         await client.connect();
         const itemsCollection = client.db("perfumes").collection("product");
-
+        // const myitemsCollection = client.db("perfumes").collection("myitems")
         app.get("/inventory", async (req, res) => {
-
-            const email = req.query.email;
-            const query = { email: email };
+            // const email = req.decoded.email;
+            const query = {};
             const cursor = itemsCollection.find(query);
             const product = await cursor.toArray();
             res.send(product);
 
         });
-
-
         app.get("/inventory/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -87,6 +84,19 @@ async function run() {
             });
             res.send({ accessToken });
         })
+
+        // app.get("/myitems", async (req, res) => {
+        //     const query = {};
+        //     const cursor = itemsCollection.find(query);
+        //     const items = await cursor.toArray();
+        //     res.send(items);
+        // })
+        // //myitems
+        // app.post("/myitems", async (req, res) => {
+        //     const myItem = req.body;
+        //     const result = await itemsCollection.insertOne(myItem);
+        //     res.send(result);
+        // })
     }
     finally {
 
